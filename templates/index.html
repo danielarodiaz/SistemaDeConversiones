@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../static/img/logo_marathon_M.png" type="image/x-icon">
+    <title>Conversor de TXT a CSV</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card card-size">
+        <div class="card-body text-center">
+            <h1 class="card-title mb-4">Conversor de TXT a CSV</h1>
+            <img src="../static/img/logo_topper.png" alt="Logo Topper" class="img-fluid size-img mb-4">
+            <img src="../static/img/logo_marathon.png" alt="Logo Marathon" class="img-fluid size-img mb-4 mx-2">
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert alert-warning" role="alert">
+                        {{ messages[0] }}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <form action="{{ url_for('transform_file') }}" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="file">Subir archivo .txt</label>
+                    <!-- Contenedor centrado con un ancho fijo -->
+                    <div class="d-flex justify-content-center">
+                        <input type="file" class="form-control-file w-75 id="file" name="file" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success w-75">Transformar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
