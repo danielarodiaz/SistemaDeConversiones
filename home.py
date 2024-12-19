@@ -1,122 +1,93 @@
-import csv
-from flask import Flask, render_template, request, redirect, send_file, flash, url_for
+from flask import Flask, render_template, request, redirect, flash, url_for
 import os
-import re
 from werkzeug.utils import secure_filename
 from datetime import datetime
+from scripts import (
+    process_txt_to_csv,
+    process_csv_to_transformed_file,
+    process_xlsx_to_csv,
+)  # Agregar otros procesadores aquí
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-# Definir la carpeta de descargas del usuario
-downloads_folder = os.path.join(os.path.expanduser("~"), "Downloads")
-app.config['OUTPUT_FOLDER'] = downloads_folder
-app.secret_key = 'your_secret_key'
+app.config.from_object("config")
+
+# Diccionario de proveedores y funciones asociadas
+PROVIDERS = {
+    "topper": {
+        "processor": process_txt_to_csv,  # Llama directamente a la función
+        "title": "Topper - Conversor de TXT a CSV",
+        "logo": "img/logo_topper.png",
+        "label": "Subir archivo .txt",
+        "file_type": ".txt",
+    },
+    "puma": {
+        "processor": process_csv_to_transformed_file,
+        "title": "Puma - Conversor de CSV a CSV",
+        "logo": "img/logo_puma.png",
+        "label": "Subir archivo .csv",
+        "file_type": ".csv",
+    },
+    "bestsox": {
+        "processor": process_xlsx_to_csv,
+        "title": "BestSox - Conversor de XLSX a CSV",
+        "logo": "img/logo_bestsox.png",
+        "label": "Subir archivo .xlsx",
+        "file_type": ".xlsx",
+    },
+    # Agregar más proveedores aquí...
+}
 
 
-# Función para procesar el archivo .txt y crear el archivo .csv
-def process_txt_to_csv(txt_file_path, csv_file_path):
-    # Abrir el archivo CSV en modo escritura
-    with open(csv_file_path, mode='w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file, delimiter='|')
-
-        # Escribir el encabezado
-        writer.writerow(["CAB", "REFERENCIA INTERNA", "FECHA", "COD PROVEEDOR", "CODIGO BARRAS", "CANTIDAD", "PRECIO", "ALMACEN", "ESTABLECIMIENTO", "DESCUENTO"])
-        
-        referencia_actual = ""
-        fecha_actual = ""
-        establecimiento_actual = ""
-
-        with open(txt_file_path, 'r', encoding='utf-8') as file_txt:
-            for line in file_txt:
-                referencia_match = re.search(r'\b\d{4}A\d{8}\b', line)
-                if referencia_match:
-                    referencia_actual = referencia_match.group(0).replace("A", "-")
-                
-                fecha_match = re.search(r'\b\d{4}-\d{2}-\d{2}\b', line[35:45])
-                if fecha_match:
-                    fecha = fecha_match.group(0)
-                    fecha_actual = f"{fecha[8:10]}{fecha[5:7]}{fecha[2:4]}"  # Formato ddmmaa
-
-                establecimiento_raw = line[191:198].strip()
-                if establecimiento_raw == "1279300":
-                    establecimiento_actual = "002"
-                elif establecimiento_raw == "1279084":
-                    establecimiento_actual = "001"
-
-                cab = "ZCOC1_"
-                cod_proveedor = "ALSAI"
-                codigo_barras = line[74:88].strip()
-
-                # Verificar si el código de barras es válido (si no es válido, eliminar la fila)
-                if not codigo_barras.isdigit():
-                    continue  # Omite esta fila y pasa a la siguiente
-
-                cantidad_raw = line[31:37].strip()
-                cantidad = cantidad_raw.split(',')[0]  # Solo parte entera
-
-                # Verificar si la cantidad es igual a 0
-                if int(cantidad) == 0:
-                    continue  # Omite esta fila y pasa a la siguiente
-
-                precio = line[44:53].strip()
-                almacen = "240001"  # Valor vacío por defecto
-                descuento = 12
-
-                # Escribir la fila en el archivo CSV
-                writer.writerow([
-                    cab,
-                    referencia_actual,
-                    fecha_actual,
-                    cod_proveedor,
-                    codigo_barras,
-                    cantidad,
-                    precio,
-                    almacen,
-                    establecimiento_actual,
-                    descuento
-                ])
-
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    """Página principal."""
+    current_year = datetime.now().year
+    return render_template("index.html", providers=PROVIDERS, current_year=current_year)
 
-@app.route('/transform', methods=['POST'])
-def transform_file():
-    if 'file' not in request.files:
-        flash('No file part')
-        return redirect(request.url)
 
-    file = request.files['file']
+@app.route("/<provider>", methods=["GET", "POST"])
+def handle_provider(provider):
+    """Maneja la lógica de cada proveedor."""
+    if provider not in PROVIDERS:
+        flash("Proveedor no reconocido.")
+        return redirect(url_for("index"))
 
-    if file.filename == '':
-        flash('No selected file')
-        return redirect(request.url)
+    provider_config = PROVIDERS[provider]
+    file_type = provider_config.get("file_type", ".txt")  # Por defecto, acepta '.txt'
 
-    if file and file.filename.endswith('.txt'):
-        txt_filename = secure_filename(file.filename)
-        txt_file_path = os.path.join(app.config['UPLOAD_FOLDER'], txt_filename)
-        file.save(txt_file_path)
+    if request.method == "GET":
+        # Renderizar plantilla del proveedor con datos dinámicos
+        return render_template(
+            "provider.html", provider=provider, config=provider_config
+        )
 
-        # Obtener la fecha y hora actual en el formato deseado
-        current_time = datetime.now().strftime('%Y-%m-%d_%H_%M')
+    if request.method == "POST":
+        # Subir y procesar archivo
+        file = request.files.get("file")
+        if not file or not file.filename.endswith(file_type):
+            flash(
+                f"Formato de archivo inválido. Por favor, suba un archivo {file_type}"
+            )
+            return redirect(url_for("handle_provider", provider=provider))
 
-        # Guardar el archivo .csv en la carpeta de descargas del usuario
-        csv_file_name = f'PED_PROV_{current_time}.csv'
-        csv_file_path = os.path.join(app.config['OUTPUT_FOLDER'], csv_file_name)
-        process_txt_to_csv(txt_file_path, csv_file_path)
+        # Guardar archivo
+        upload_folder = os.path.join(app.config["UPLOAD_FOLDER"], provider)
+        os.makedirs(upload_folder, exist_ok=True)
+        file_name = secure_filename(file.filename)
+        input_path = os.path.join(upload_folder, file_name)
+        file.save(input_path)
 
-        return send_file(csv_file_path)
+        # Procesar archivo
+        current_time = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+        output_file_name = f"{provider.upper()}_{current_time}.csv"
+        output_path = os.path.join(app.config["OUTPUT_FOLDER"], output_file_name)
 
-    flash('Invalid file format. Please upload a .txt file.')
-    return redirect(url_for('index'))
+        processor = provider_config["processor"]
+        processor(input_path, output_path)  # Ejecuta la función directamente
+
+        flash(f"Archivo transformado y guardado como {output_file_name}")
+        return redirect(url_for("handle_provider", provider=provider))
+
 
 if __name__ == "__main__":
-    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
     app.run(debug=True)
-
-
-
-
-
-

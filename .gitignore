@@ -1,0 +1,14 @@
+# Ignorar entornos virtuales
+.venv/
+
+# Ignorar caché de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignorar configuraciones locales
+.env
+
+# Ignorar directorios de salida
+uploads/
+

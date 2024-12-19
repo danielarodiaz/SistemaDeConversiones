@@ -1,0 +1,44 @@
+html {
+    min-height: 100%;
+    position: relative;
+  }
+  
+  body {
+    background: #002a61;
+    margin: 0;
+    margin-bottom: 40px;
+  }
+  
+  nav{
+    background-color: #e3f2fd;
+  }
+  
+  .card-img-top {
+    height: 200px; /* Ajusta la altura de las imágenes */
+  width: 100%; /* Asegura que las imágenes ocupen todo el ancho */
+  object-fit: cover; /* Recorta las imágenes para que encajen en el espacio */
+  border-radius: 5px 5px 0 0; /* Da bordes redondeados superiores, opcional */
+  }
+  
+  footer {
+    background-color: #e3f2fd;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    color: #002a61; /* Texto oscuro para mayor contraste */
+    padding: 10px 0; /* Añade padding para centrar el texto verticalmente */
+  }
+  
+  footer .footer-text {
+    margin: 0;
+    font-size: 14px;
+  }
+  
+  footer .footer-img {
+    display: block;
+    margin: 0 auto 10px auto; /* Centra la imagen y añade espacio con el texto */
+  }
+  .size-img{
+    max-width: 200px;
+  }
+  
