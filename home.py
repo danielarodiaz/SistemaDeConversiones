@@ -6,6 +6,7 @@ from scripts import (
     process_txt_to_csv,
     process_csv_to_transformed_file,
     process_xlsx_to_csv,
+    process_xlsx_to_transformed_csv,
 )  # Agregar otros procesadores aquí
 
 app = Flask(__name__)
@@ -34,6 +35,13 @@ PROVIDERS = {
         "label": "Subir archivo .xlsx",
         "file_type": ".xlsx",
     },
+    "diadora":{
+        "processor": process_xlsx_to_transformed_csv,
+        "title": "G7 Diadora - Conversor de XLSX a CSV",
+        "logo": "img/logo_diadora.png",
+        "label": "Subir archivo .xlsx",
+        "file_type": ".xlsx",
+    }
     # Agregar más proveedores aquí...
 }
 
@@ -81,6 +89,11 @@ def handle_provider(provider):
         current_time = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
         output_file_name = f"{provider.upper()}_{current_time}.csv"
         output_path = os.path.join(app.config["OUTPUT_FOLDER"], output_file_name)
+
+
+        # Depuración: Verificar rutas
+        print(f"Ruta de entrada: {input_path}")
+        print(f"Ruta de salida: {output_path}")
 
         processor = provider_config["processor"]
         processor(input_path, output_path)  # Ejecuta la función directamente
