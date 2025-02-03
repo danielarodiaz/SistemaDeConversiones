@@ -45,7 +45,8 @@ def process_xlsx_to_transformed_csv(input_path, output_path):
                 elif len(almacen) > 6:
                     almacen = almacen[:6]
 
-                establecimiento = "002" if row['Nombre'] == "MARATHON SRL" else "001"
+                establecimiento = "002" if "marathon" in str(row['Nombre']).lower() else "001"
+
 
                 # Construcción de la fila transformada
                 transformed_row = {

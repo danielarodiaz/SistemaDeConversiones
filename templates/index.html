@@ -4,15 +4,15 @@
   <div class="row mt-4 justify-content-center">
     {% for provider, config in providers.items() %}
     <div class="col-md-4 col-sm-6 d-flex justify-content-center mb-4">
-      <a href="{{ url_for('handle_provider', provider=provider) }}">
-        <div class="card text-center">
+      <a href="{{ url_for('handle_provider', provider=provider) }}" class="text-decoration-none">
+        <div class="card-main bg-light">
           <img
             src="{{ url_for('static', filename=config['logo']) }}"
             class="card-img-top"
             alt="{{ provider }}"
           />
-          <div class="card-body">
-            <h5 class="card-title">{{ provider.capitalize() }}</h5>
+          <div class="card-body-main">
+            <h5 class="card-title-main">{{ provider.capitalize() }}</h5>
           </div>
         </div>
       </a>

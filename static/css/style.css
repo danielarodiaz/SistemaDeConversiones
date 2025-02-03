@@ -1,28 +1,64 @@
 html {
-    min-height: 100%;
-    position: relative;
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
   }
   
   body {
     background: #002a61;
     margin: 0;
     margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+  }
+  main {
+    flex: 1;
   }
   
   nav{
     background-color: #e3f2fd;
   }
+  .card-main {
+    width: 300px; /* Tamaño uniforme para todas las tarjetas */
+    height: 250px; /* Ajusta la altura de todas las tarjetas */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease-in-out;
+}
+.card-main:hover {
+  transform: scale(1.05); /* Efecto de hover */
+}
   
-  .card-img-top {
-    height: 200px; /* Ajusta la altura de las imágenes */
+.card-img-top {
+  height: 200px; /* Mantiene una altura fija */
   width: 100%; /* Asegura que las imágenes ocupen todo el ancho */
-  object-fit: cover; /* Recorta las imágenes para que encajen en el espacio */
-  border-radius: 5px 5px 0 0; /* Da bordes redondeados superiores, opcional */
-  }
+  object-fit: contain; /* Muestra la imagen completa sin recortar */
+  border-radius: 10px 10px 0 0; /* Mantiene los bordes redondeados superiores */
+  background-color: white; /* Agrega fondo blanco si la imagen no cubre el espacio */
+  padding: 5px; /* Agrega un pequeño margen interno si la imagen tiene bordes */
+}
+
+
+  .card-body-main {
+    flex-grow: 1; /* Hace que el contenido se expanda uniformemente */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.card-title-main {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
   
   footer {
     background-color: #e3f2fd;
-    position: absolute;
     bottom: 0;
     width: 100%;
     color: #002a61; /* Texto oscuro para mayor contraste */
