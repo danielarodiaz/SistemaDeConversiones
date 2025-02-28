@@ -17,8 +17,15 @@
 
       {% with messages = get_flashed_messages() %} {% if messages %}
       <div class="alert alert-warning" role="alert">{{ messages[0] }}</div>
-      {% endif %} {% endwith %}
-
+      {% endif %} {% endwith %} 
+      {% if request.args.get("filename") %}
+      <script>
+          window.onload = function() {
+              window.location.href = "{{ url_for('download_file', filename=request.args.get('filename')) }}";
+          };
+      </script>
+      {% endif %}
+      
       <form
         action="{{ url_for('handle_provider', provider=provider) }}"
         method="post"

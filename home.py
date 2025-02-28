@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import Flask, render_template, request, redirect, flash, url_for, send_file
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -7,6 +7,7 @@ from scripts import (
     process_csv_to_transformed_file,
     process_xlsx_to_csv,
     process_xlsx_to_transformed_csv,
+    process_xlsx_to_transformed_csv_saucony,
 )  # Agregar otros procesadores aquí
 
 app = Flask(__name__)
@@ -41,6 +42,13 @@ PROVIDERS = {
         "logo": "img/logo_diadora.png",
         "label": "Subir archivo .xlsx",
         "file_type": ".xlsx",
+    },
+    "saucony":{
+        "processor": process_xlsx_to_transformed_csv_saucony,
+        "title": "Suola Saucony - Conversor de XLSX a CSV",
+        "logo": "img/logo_saucony.png",
+        "label": "Subir archivo .xlsx",
+        "file_type": ".xlsx",
     }
     # Agregar más proveedores aquí...
 }
@@ -52,6 +60,11 @@ def index():
     current_year = datetime.now().year
     return render_template("index.html", providers=PROVIDERS, current_year=current_year)
 
+@app.route("/download/<filename>")
+def download_file(filename):
+    """Forza la descarga del archivo en el navegador del usuario."""
+    file_path = os.path.join(app.config["OUTPUT_FOLDER"], filename)
+    return send_file(file_path, as_attachment=True)
 
 @app.route("/<provider>", methods=["GET", "POST"])
 def handle_provider(provider):
@@ -98,8 +111,11 @@ def handle_provider(provider):
         processor = provider_config["processor"]
         processor(input_path, output_path)  # Ejecuta la función directamente
 
-        flash(f"Archivo transformado y guardado como {output_file_name}")
-        return redirect(url_for("handle_provider", provider=provider))
+        flash(f"Archivo transformado y guardado como {output_file_name}", "success")
+        return redirect(url_for("handle_provider", provider=provider, filename=output_file_name))
+        
+    #return redirect(url_for('download_file', filename=output_file_name))
+
 
 
 if __name__ == "__main__":
