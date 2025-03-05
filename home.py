@@ -8,6 +8,7 @@ from scripts import (
     process_xlsx_to_csv,
     process_xlsx_to_transformed_csv,
     process_xlsx_to_transformed_csv_saucony,
+    process_xlsx_to_transformed_csv_kdy,
 )  # Agregar otros procesadores aquí
 
 app = Flask(__name__)
@@ -47,6 +48,13 @@ PROVIDERS = {
         "processor": process_xlsx_to_transformed_csv_saucony,
         "title": "Suola Saucony - Conversor de XLSX a CSV",
         "logo": "img/logo_saucony.png",
+        "label": "Subir archivo .xlsx",
+        "file_type": ".xlsx",
+    },
+    "kdy":{
+        "processor": process_xlsx_to_transformed_csv_kdy,
+        "title": "Kenyan KDY - Conversor de XLSX a CSV",
+        "logo": "img/logo_kdy.png",
         "label": "Subir archivo .xlsx",
         "file_type": ".xlsx",
     }
