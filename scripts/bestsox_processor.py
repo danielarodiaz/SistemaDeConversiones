@@ -14,7 +14,7 @@ def process_xlsx_to_csv(input_path, output_folder):
         sheets = pd.read_excel(input_path, sheet_name=None)
 
         # Crear el directorio de salida si no existe
-        os.makedirs(output_folder, exist_ok=True)
+        #os.makedirs(output_folder, exist_ok=True)
 
         for sheet_name, data in sheets.items():
             print(f"Procesando pestaña: {sheet_name}")
@@ -89,7 +89,7 @@ def process_xlsx_to_csv(input_path, output_folder):
             if transformed_data:
                 output_file = os.path.join(output_folder, f"{sheet_name}.csv")
                 transformed_df = pd.DataFrame(transformed_data)
-                transformed_df.to_csv(output_file, index=False, sep="|", encoding='utf-8-sig')  # Separador personalizado
+                transformed_df.to_csv(output_file, index=False, sep="|", encoding='utf-8')  # Separador personalizado
                 print(f"Archivo generado: {output_file}")
             else:
                 print(f"No hay datos válidos en la pestaña '{sheet_name}'")
