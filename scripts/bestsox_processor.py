@@ -15,12 +15,22 @@ def process_xlsx_to_csv(input_path, output_folder):
 
         # Crear el directorio de salida si no existe
         #os.makedirs(output_folder, exist_ok=True)
+        
+        #output_folder = os.path.dirname(input_path)  # Guarda en la misma carpeta del archivo de entrada
+        
+        # Obtener la carpeta de descargas del usuario actual
+        #download_folder = os.path.join(os.path.expanduser("~"), "Downloads")
 
+        # Definir el nombre del archivo CSV de salida (con timestamp para evitar conflictos)
+        #output_file = os.path.join(download_folder, "BESTSOX_Procesado.csv")
+        
+        
+        transformed_data = []
         for sheet_name, data in sheets.items():
             print(f"Procesando pestaña: {sheet_name}")
             print(f"Datos iniciales: {data.head()}")  # Ver los primeros datos de la pestaña
 
-            transformed_data = []
+            #transformed_data = []
             for _, row in data.iterrows():
                 try:
                     # Procesar la columna Fecha
@@ -85,16 +95,28 @@ def process_xlsx_to_csv(input_path, output_folder):
                 except Exception as e:
                     print(f"Error procesando fila: {e}")
 
-            # Guardar cada pestaña como un archivo .csv
+            # # Guardar cada pestaña como un archivo .csv
+            # if transformed_data:
+            #     output_file = os.path.join(output_folder, f"{sheet_name}.csv")
+            #     transformed_df = pd.DataFrame(transformed_data)
+            #     transformed_df.to_csv(output_file, index=False, sep="|", encoding='utf-8-sig')  # Separador personalizado
+            #      # 🔹 Asignar permisos al archivo para asegurar que Flask pueda acceder
+            #     os.chmod(output_file, 0o777)
+            #     print(f"Archivo generado: {output_file}")
+            # else:
+            #     print(f"No hay datos válidos en la pestaña '{sheet_name}'")
+            
+            # Guardar todo en un solo archivo CSV
             if transformed_data:
-                output_file = os.path.join(output_folder, f"{sheet_name}.csv")
                 transformed_df = pd.DataFrame(transformed_data)
-                transformed_df.to_csv(output_file, index=False, sep="|", encoding='utf-8-sig')  # Separador personalizado
-                 # 🔹 Asignar permisos al archivo para asegurar que Flask pueda acceder
-                os.chmod(output_file, 0o777)
-                print(f"Archivo generado: {output_file}")
+                transformed_df.to_csv(output_folder, index=False, sep="|", encoding='utf-8-sig')
+
+            # 🔹 Asegurar permisos para que Flask pueda acceder
+                os.chmod(output_folder, 0o777)
+
+                print(f"Archivo generado: {output_folder}")
             else:
-                print(f"No hay datos válidos en la pestaña '{sheet_name}'")
+                print("No se generaron datos válidos")
 
     except Exception as e:
         raise RuntimeError(f"Error al procesar el archivo: {e}")
