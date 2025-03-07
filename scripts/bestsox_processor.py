@@ -67,10 +67,6 @@ def process_xlsx_to_csv(input_path, output_folder):
 
                     establecimiento = "002" if row['Nombre'] == "MARATHON SRL" else "001"
 
-                    descuento = row['Dto.1']
-                    if not isinstance(descuento, (int, float)):
-                        print(f"Descuento inválido: {row['Dto.1']}")
-                        continue
 
                     # Construir la fila transformada
                     transformed_row = {
@@ -83,7 +79,7 @@ def process_xlsx_to_csv(input_path, output_folder):
                         "PRECIO": str(float(precio)).replace('.', ','), # Cambiar el punto por coma
                         "ALMACEN": almacen,
                         "ESTABLECIMIENTO": establecimiento,
-                        "DESCUENTO": int(descuento),
+                        "DESCUENTO": 12
                     }
                     transformed_data.append(transformed_row)
                 except Exception as e:
