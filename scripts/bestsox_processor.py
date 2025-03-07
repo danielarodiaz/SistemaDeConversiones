@@ -89,7 +89,9 @@ def process_xlsx_to_csv(input_path, output_folder):
             if transformed_data:
                 output_file = os.path.join(output_folder, f"{sheet_name}.csv")
                 transformed_df = pd.DataFrame(transformed_data)
-                transformed_df.to_csv(output_file, index=False, sep="|", encoding='utf-8')  # Separador personalizado
+                transformed_df.to_csv(output_file, index=False, sep="|", encoding='utf-8-sig')  # Separador personalizado
+                 # 🔹 Asignar permisos al archivo para asegurar que Flask pueda acceder
+                os.chmod(output_file, 0o777)
                 print(f"Archivo generado: {output_file}")
             else:
                 print(f"No hay datos válidos en la pestaña '{sheet_name}'")
