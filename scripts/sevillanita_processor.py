@@ -87,7 +87,7 @@ def process_csv_to_transformed_sevillanita(input_path, output_path):
         # Aplicar numeración a cada archivo
         transformed_data_marathon = add_consecutive_numbers(transformed_data_marathon)
         transformed_data_others = add_consecutive_numbers(transformed_data_others)
-
+        
         # 🔹 Encabezados de las dos primeras líneas
         header_line_1 = ["DocNum", "DocEntry", "DocType", "DocDate", "TaxDate", "DocDueDate",
                          "CardCode", "NumAtCard", "DocCurrency", "JournalMemo", "Comments",
@@ -107,13 +107,19 @@ def process_csv_to_transformed_sevillanita(input_path, output_path):
                     df.to_csv(f, index=False, sep=";", header=False)  # Guardar sin encabezados de pandas
                 os.chmod(file_path, 0o777)
                 print(f"Archivo generado: {file_path}")
+                
+        # 🔹 Generar nombres de archivos con CABECERA_
+        marathon_file = output_path.replace(".csv", "_marathon.csv")
+        others_file = output_path.replace(".csv", "_blanco.csv")
 
         # Guardar ambos archivos
-        save_csv(output_path + "_marathon.csv", transformed_data_marathon)
-        save_csv(output_path + "_otros.csv", transformed_data_others)
+        save_csv(marathon_file, transformed_data_marathon)
+        save_csv(others_file, transformed_data_others)
+        
+        return marathon_file, others_file  # Retornamos los nombres de los archivos generados
 
-        if not transformed_data_marathon and not transformed_data_others:
-            print("No se generaron datos válidos.")
+        # if not transformed_data_marathon and not transformed_data_others:
+        #     print("No se generaron datos válidos.")
 
     except Exception as e:
         raise RuntimeError(f"Error al procesar el archivo: {e}")

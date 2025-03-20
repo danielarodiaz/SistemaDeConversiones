@@ -125,10 +125,27 @@ def handle_provider(provider):
         print(f"Ruta de salida: {output_path}")
 
         processor = provider_config["processor"]
-        processor(input_path, output_path)  # Ejecuta la función directamente
+        
+         # 🔹 Si el proveedor es "sevillanita", manejar múltiples archivos
+        if provider == "sevillanita":
+            marathon_file, others_file = processor(input_path, output_path)
 
-        flash(f"Archivo transformado y guardado como {output_file_name}", "success")
-        return redirect(url_for("handle_provider", provider=provider, filename=output_file_name))
+            # Renombrar archivos con CABECERA_
+            marathon_final = output_path.replace(".csv", "_CABECERA_marathon.csv")
+            others_final = output_path.replace(".csv", "_CABECERA_blanco.csv")
+
+            os.rename(marathon_file, marathon_final)
+            os.rename(others_file, others_final)
+
+            files = [marathon_final, others_final]
+            flash(f"Archivos generados: {os.path.basename(marathon_final)} y {os.path.basename(others_final)}", "success")
+
+            return render_template("provider.html", provider=provider, config=provider_config, files=files)
+        else:
+            # Procesamiento normal para los otros proveedores
+            processor(input_path, output_path)  # Ejecuta la función directamente
+            flash(f"Archivo transformado y guardado como {output_file_name}", "success")
+            return redirect(url_for("handle_provider", provider=provider, filename=output_file_name))
         
     #return redirect(url_for('download_file', filename=output_file_name))
 
