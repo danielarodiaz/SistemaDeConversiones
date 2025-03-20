@@ -9,6 +9,7 @@ from scripts import (
     process_xlsx_to_transformed_csv,
     process_xlsx_to_transformed_csv_saucony,
     process_xlsx_to_transformed_csv_kdy,
+    process_csv_to_transformed_sevillanita,
 )  # Agregar otros procesadores aquí
 
 app = Flask(__name__)
@@ -57,7 +58,14 @@ PROVIDERS = {
         "logo": "img/logo_kdy.png",
         "label": "Subir archivo .xlsx",
         "file_type": ".xlsx",
-    }
+    },
+    "sevillanita":{
+        "processor": process_csv_to_transformed_sevillanita,
+        "title": "Sevillanita - Conversor de CSV a CSV",
+        "logo": "img/logo_sevillanita.png",
+        "label": "Subir archivo .csv",
+        "file_type": ".csv",  
+    },
     # Agregar más proveedores aquí...
 }
 

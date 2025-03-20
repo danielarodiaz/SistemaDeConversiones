@@ -4,3 +4,4 @@ from .bestsox_processor import process_xlsx_to_csv
 from .diadora_processor import process_xlsx_to_transformed_csv
 from .saucony_processor import process_xlsx_to_transformed_csv_saucony
 from .kdy_processor import process_xlsx_to_transformed_csv_kdy
+from .sevillanita_processor import  process_csv_to_transformed_sevillanita
