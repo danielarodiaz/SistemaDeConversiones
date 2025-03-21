@@ -16,7 +16,7 @@
       />
 
       {% with messages = get_flashed_messages() %} {% if messages %}
-      <div class="alert alert-warning" role="alert">{{ messages[0] }}</div>
+      <div class="alert alert-warning" role="alert">{{ messages[0] | safe }}</div>
       {% endif %} {% endwith %} 
       {% if request.args.get("filename") %}
       <script>

@@ -128,18 +128,25 @@ def handle_provider(provider):
         
          # 🔹 Si el proveedor es "sevillanita", manejar múltiples archivos
         if provider == "sevillanita":
-            marathon_file, others_file = processor(input_path, output_path)
+            # Llamar al processor que devuelve 4 archivos
+            cab_mar, cab_otr, det_mar, det_otr = processor(input_path, output_path)
+            files = [cab_mar, cab_otr, det_mar, det_otr]
+            
+            # Armar mensaje detallado
+            msg = (
+                f"4 archivos generados correctamente:\n"
+                f"MARATHON:\n"
+                f"- {os.path.basename(cab_mar)}\n"
+                f"- {os.path.basename(det_mar)}\n"
+                f"BLANCO:\n"
+                f"- {os.path.basename(cab_otr)}\n"
+                f"- {os.path.basename(det_otr)}"
+            )
+            
+            # Mostrar mensaje formateado
+            flash(msg.replace("\n", "<br>"), "success")
 
-            # Renombrar archivos con CABECERA_
-            marathon_final = output_path.replace(".csv", "_CABECERA_marathon.csv")
-            others_final = output_path.replace(".csv", "_CABECERA_blanco.csv")
-
-            os.rename(marathon_file, marathon_final)
-            os.rename(others_file, others_final)
-
-            files = [marathon_final, others_final]
-            flash(f"Archivos generados: {os.path.basename(marathon_final)} y {os.path.basename(others_final)}", "success")
-
+            # Renderizar vista con enlaces de descarga
             return render_template("provider.html", provider=provider, config=provider_config, files=files)
         else:
             # Procesamiento normal para los otros proveedores
