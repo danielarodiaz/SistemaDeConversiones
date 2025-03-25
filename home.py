@@ -128,26 +128,31 @@ def handle_provider(provider):
         
          # 🔹 Si el proveedor es "sevillanita", manejar múltiples archivos
         if provider == "sevillanita":
-            # Llamar al processor que devuelve 4 archivos
-            cab_mar, cab_otr, det_mar, det_otr = processor(input_path, output_path)
-            files = [cab_mar, cab_otr, det_mar, det_otr]
-            
-            # Armar mensaje detallado
-            msg = (
-                f"4 archivos generados correctamente:\n"
-                f"MARATHON:\n"
-                f"- {os.path.basename(cab_mar)}\n"
-                f"- {os.path.basename(det_mar)}\n"
-                f"BLANCO:\n"
-                f"- {os.path.basename(cab_otr)}\n"
-                f"- {os.path.basename(det_otr)}"
-            )
-            
-            # Mostrar mensaje formateado
-            flash(msg.replace("\n", "<br>"), "success")
+            zip_file_path = processor(input_path, output_path)
+            zip_file_name = os.path.basename(zip_file_path)
 
-            # Renderizar vista con enlaces de descarga
-            return render_template("provider.html", provider=provider, config=provider_config, files=files)
+            flash(f"4 archivos generados correctamente. Se descargará un ZIP automáticamente.", "success")
+            return redirect(url_for("download_file", filename=zip_file_name))
+            # # Llamar al processor que devuelve 4 archivos
+            # cab_mar, cab_otr, det_mar, det_otr = processor(input_path, output_path)
+            # files = [cab_mar, cab_otr, det_mar, det_otr]
+            
+            # # Armar mensaje detallado
+            # msg = (
+            #     f"4 archivos generados correctamente:\n"
+            #     f"MARATHON:\n"
+            #     f"- {os.path.basename(cab_mar)}\n"
+            #     f"- {os.path.basename(det_mar)}\n"
+            #     f"BLANCO:\n"
+            #     f"- {os.path.basename(cab_otr)}\n"
+            #     f"- {os.path.basename(det_otr)}"
+            # )
+            
+            # # Mostrar mensaje formateado
+            # flash(msg.replace("\n", "<br>"), "success")
+
+            # # Renderizar vista con enlaces de descarga
+            # return render_template("provider.html", provider=provider, config=provider_config, files=files)
         else:
             # Procesamiento normal para los otros proveedores
             processor(input_path, output_path)  # Ejecuta la función directamente

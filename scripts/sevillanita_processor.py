@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import re
+import zipfile
 
 def process_csv_to_transformed_sevillanita(input_path, output_path):
     try:
@@ -176,8 +177,18 @@ def process_csv_to_transformed_sevillanita(input_path, output_path):
         save_csv(cab_otr_path, cabecera_otros, header_line_1_cab, header_line_2_cab)
         save_csv(det_mar_path, detalle_marathon, header_line_1_det, header_line_2_det)
         save_csv(det_otr_path, detalle_otros, header_line_1_det, header_line_2_det)
+        
+         # Generar ZIP
+        zip_path = output_path.replace(".csv", ".zip")
+        with zipfile.ZipFile(zip_path, 'w') as zipf:
+            zipf.write(cab_mar_path, os.path.basename(cab_mar_path))
+            zipf.write(cab_otr_path, os.path.basename(cab_otr_path))
+            zipf.write(det_mar_path, os.path.basename(det_mar_path))
+            zipf.write(det_otr_path, os.path.basename(det_otr_path))
 
-        return cab_mar_path, cab_otr_path, det_mar_path, det_otr_path
+        return zip_path
+
+        #return cab_mar_path, cab_otr_path, det_mar_path, det_otr_path
 
     except Exception as e:
         raise RuntimeError(f"Error al procesar el archivo: {e}")
