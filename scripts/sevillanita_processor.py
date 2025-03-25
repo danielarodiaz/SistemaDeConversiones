@@ -162,7 +162,7 @@ def process_csv_to_transformed_sevillanita(input_path, output_path):
                              "PTICode", "Letter", "FolNumFrom", "FolNumTo", "Series"]
 
         header_line_1_det = ["ParentKey", "LineNum", "ItemCode", "ItemDescription", "Quantity", "Price",
-                             "TaxCode", "TaxOnly", "AccountCode", "OcrCode", "OcrCode2"]
+                             "TaxCode", "TaxOnly", "AccountCode", "CostingCode", "CostingCode2"]
         header_line_2_det = ["DocNum", "LineNum", "ItemCode", "Dscription", "Quantity", "Price",
                              "TaxCode", "TaxOnly", "AcctCode", "OcrCode", "OcrCode2"]
 
