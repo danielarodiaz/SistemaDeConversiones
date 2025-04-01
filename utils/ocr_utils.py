@@ -40,10 +40,12 @@ def calcular_ocr_code(destinatario, localidad, domicilio, remitente=""):
     provincia = ""
     if "ROSARIO" in localidad_raw:
         provincia = "SFE"
-    elif any(p in localidad_raw for p in ["SALTA", "JVG", "GUEMES", "TARTAGAL", "METAN"]):
+    elif any(p in localidad_raw for p in ["SALTA", "JVG","J V GONZALEZ SALTA", "GUEMES", "TARTAGAL SALTA", "METAN"]):
         provincia = "SAL"
     elif any(p in localidad_raw for p in ["TUCUMAN","S M DE TUCUMAN","S.M TUCUMAN","TAFI VIEJO", "CONCEPCION", "YERBA", "AGUILARES", "MONTEROS"]):
         provincia = "TUC"
+    elif any(p in localidad_raw for p in ["LESDEMA JUJUY", "JUJUY"]):
+        provincia = "JUJ"
 
     # Buscar coincidencia en base provincial
     if provincia and provincia in ocr_database:

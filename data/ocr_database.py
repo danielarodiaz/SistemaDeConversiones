@@ -1,16 +1,16 @@
 ocr_database = {
     "SFE": {
         "200101": ["HIPER ROS MAX"],
-        "200102": ["S LUIS 1330 OUT"],
-        "200103": ["S LUIS 1261"],
-        "200104": ["PTE PERON 5115"],
-        "200105": ["MENDOZA 3848", "MENDOZA"],
+        "200102": ["SAN LUIS", "S LUIS 1330 OUT"],
+        "200103": ["SAN LUIS","S LUIS 1261"],
+        "200104": ["PRESIDENTE PERON","PTE PERON 5115"],
+        "200105": ["MENDOZA", "MENDOZA 3848"],
         "200106": ["PORTAL"],
         "200107": ["HIPER ROS CM"],
         "200108": ["HIPER ROS OUT"],
     },
     "SAL": {
-        "170101": ["PORTAL CM"],
+        "170101": ["SARMIENTO Y ARENALES", "PORTAL CM"],
         "170102": ["HIPER SAL CM"],
         "170103": ["HIPER SAL OUT"],
         "170104": ["TAVELLA AV Y EX COMB MALV","HIPER SAL MAX"],
@@ -42,5 +42,8 @@ ocr_database = {
         "240503": ["GP CROCS"],
         "240504": ["PORTAL CROCS", "PORTAL"],
         "240601": ["AV LEANDRO ALEM","AV ALEM 279", "ALEM"],
+    },
+    "JUJ":{
+        "090201": ["BELGRANO", "LEDESMA", "LED01 - BELGRANO 390"]
     }
 }
