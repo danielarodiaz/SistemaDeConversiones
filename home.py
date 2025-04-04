@@ -154,7 +154,7 @@ def handle_provider(provider):
         else:
             # Procesamiento normal para los otros proveedores
             processor(input_path, output_path)  # Ejecuta la función directamente
-            flash(f"Archivo transformado y guardado como {output_file_name}", "success")
+            flash(f"Archivo transformado y guardado como: <strong>{output_file_name}</strong>", "success")
             return redirect(url_for("handle_provider", provider=provider, filename=output_file_name))
             #return redirect(url_for('download_file', filename=output_file_name))
 
