@@ -37,7 +37,7 @@ ocr_database = {
         "240203": ["ITALIA 1298 OUT"],
         "240301": ["COLON 180"],
         "240401": ["ALBERDI JB","ALBERDI 952", "ALBERDI"],
-        "240501": ["GP MAX"],
+        "240501": ["AV JUAN D PERON","GP MAX"],
         "240502": ["GP BIKE"],
         "240503": ["GP CROCS"],
         "240504": ["PORTAL CROCS", "PORTAL"],

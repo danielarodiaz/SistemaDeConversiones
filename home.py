@@ -146,7 +146,7 @@ def handle_provider(provider):
 
             # Construir mensaje compacto
             grupos_str = " & ".join(grupos_presentes) if grupos_presentes else "Sin grupo"
-            msg = f"{grupos_str} - Se descargará un ZIP automáticamente: <strong>{zip_file_name}</strong>"
+            msg = f"Guias de: {grupos_str} - Se descargará un ZIP automáticamente: <strong>{zip_file_name}</strong>"
 
             flash(msg, "success")
             return redirect(url_for("handle_provider", provider=provider, filename=zip_file_name))
