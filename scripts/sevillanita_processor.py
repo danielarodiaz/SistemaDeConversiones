@@ -11,8 +11,11 @@ def process_csv_to_transformed_sevillanita(input_path, output_path):
             first_line = f.readline()
             delimiter = ";" if ";" in first_line else ","
 
-        data = pd.read_csv(input_path, dtype=str, delimiter=delimiter)
+        data = pd.read_csv(input_path, dtype=str, delimiter=delimiter, on_bad_lines="skip")
         data.columns = [col.strip() for col in data.columns]
+        
+        # 🔹 Eliminar columnas vacías o con nombres "Unnamed"
+        data = data[[col for col in data.columns if col != "" and not col.startswith("Unnamed")]]
         
         # Mapeo de nombres de columnas con variantes
         column_mapping = {
@@ -42,22 +45,17 @@ def process_csv_to_transformed_sevillanita(input_path, output_path):
 
         for _, row in data.iterrows():
             try:
-                 # 🔒 Ignorar filas completamente vacías o corruptas
-                if row.isnull().all():
+                # Ignorar filas corruptas o vacías en su mayoría
+                if not isinstance(row, pd.Series) or row.isnull().sum() > len(row) - 2:
                     continue
 
                 # 🔒 También descartar si no hay 'Cuenta' o 'F.Emis.'
                 if pd.isna(row.get("Cuenta")) or pd.isna(row.get("F.Emis.")):
                     continue
-
-                # 🔐 Normalizar campos que puedan venir como float o NaN
-                cuenta = str(row.get("Cuenta", "")).strip()
-                if cuenta == "":
-                    continue
-
+                
                 # Fecha de emisión: soporta DDMMYYYY o DD/MM/YYYY
                 fecha_emision = str(row["F.Emis."]).strip()
-                if re.match(r"^\d{2}/\d{1,2}/\d{4}$", fecha_emision):  # ej: 20/3/2025
+                if re.match(r"^\d{1,2}/\d{1,2}/\d{4}$", fecha_emision):  # permite 1/4/2025
                     partes = fecha_emision.split("/")
                     fecha_emision = f"{partes[2]}{partes[1].zfill(2)}{partes[0].zfill(2)}"
                 elif re.match(r"^\d{8}$", fecha_emision):  # ej: 20032025
@@ -70,16 +68,12 @@ def process_csv_to_transformed_sevillanita(input_path, output_path):
                 letter = "A"
                 fol_num_from = row["Nro.Guia"].strip().zfill(8)
                 num_at_card = f"{letter}{pti_code}{fol_num_from}"
-                
+
+                # 🔐 Normalizar campos que puedan venir como float o NaN
                 cuenta = str(row.get("Cuenta", "")).strip()
-
-                if "Cuenta" not in data.columns:
-                    raise ValueError("No se encontró la columna 'Cuenta' en el archivo.")
-
-                # Si la cuenta está vacía, descartar fila
                 if cuenta == "":
                     continue
-
+                
                 # Asignación directa por cuenta
                 if cuenta == "13437":
                     belongs_to_marathon = True
@@ -131,12 +125,18 @@ def process_csv_to_transformed_sevillanita(input_path, output_path):
                         102: "FLETES - KILOS",
                         103: "FLETES - CAJAS"
                     }.get(item_code, "FLETE")
+                    
+                    def safe_int(value):
+                        try:
+                            return int(str(value).replace(",", ".").split(".")[0].strip())
+                        except:
+                            return 0
 
                     quantity = 1
                     if item_code == 102:
-                        quantity = int(row.get("Kilos", "0"))
+                        quantity = safe_int(row.get("Kilos", "0"))
                     elif item_code == 103:
-                        quantity = int(row.get("Bultos", "0"))
+                        quantity = safe_int(row.get("Bultos", "0"))
 
                     price = 0.0
                     if item_code == 100:
@@ -204,24 +204,20 @@ def process_csv_to_transformed_sevillanita(input_path, output_path):
         print(f"Registros MARATHON: cabecera={len(cabecera_marathon)}, detalle={len(detalle_marathon)}")
         print(f"Registros BLANCO: cabecera={len(cabecera_otros)}, detalle={len(detalle_otros)}")
 
-
         # Guardar archivos
         save_csv(cab_mar_path, cabecera_marathon, header_line_1_cab, header_line_2_cab)
         save_csv(cab_otr_path, cabecera_otros, header_line_1_cab, header_line_2_cab)
         save_csv(det_mar_path, detalle_marathon, header_line_1_det, header_line_2_det)
-        save_csv(det_otr_path, detalle_otros, header_line_1_det, header_line_2_det)
+        save_csv(det_otr_path, detalle_otros, header_line_1_det, header_line_2_det)     
         
-         # Generar ZIP
+        # ✅ Generar ZIP solo con archivos que existen
         zip_path = output_path.replace(".csv", ".zip")
         with zipfile.ZipFile(zip_path, 'w') as zipf:
-            zipf.write(cab_mar_path, os.path.basename(cab_mar_path))
-            zipf.write(cab_otr_path, os.path.basename(cab_otr_path))
-            zipf.write(det_mar_path, os.path.basename(det_mar_path))
-            zipf.write(det_otr_path, os.path.basename(det_otr_path))
+            for path in [cab_mar_path, cab_otr_path, det_mar_path, det_otr_path]:
+                if os.path.exists(path):
+                    zipf.write(path, os.path.basename(path))
 
         return zip_path
-
-        #return cab_mar_path, cab_otr_path, det_mar_path, det_otr_path
 
     except Exception as e:
         print("Fila con error:", row.to_dict())

@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, flash, url_for, sen
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
+from collections import defaultdict
 from scripts import (
     process_txt_to_csv,
     process_csv_to_transformed_file,
@@ -101,16 +102,21 @@ def handle_provider(provider):
     if request.method == "POST":
         # Subir y procesar archivo
         file = request.files.get("file")
-        if not file or not file.filename.endswith(file_type):
+        
+        # Normalizar extensión a minúscula para evitar rechazos por .CSV vs .csv (type of file in general)
+        file_name = secure_filename(file.filename)
+        base, ext = os.path.splitext(file_name)
+        file_name = base + ext.lower()  # convierte .CSV → .csv
+
+        if not file or not file_name.endswith(file_type):
             flash(
                 f"Formato de archivo inválido. Por favor, suba un archivo {file_type}"
             )
             return redirect(url_for("handle_provider", provider=provider))
-
+        
         # Guardar archivo
         upload_folder = os.path.join(app.config["UPLOAD_FOLDER"], provider)
         os.makedirs(upload_folder, exist_ok=True)
-        file_name = secure_filename(file.filename)
         input_path = os.path.join(upload_folder, file_name)
         file.save(input_path)
 
@@ -131,37 +137,26 @@ def handle_provider(provider):
             zip_file_path = processor(input_path, output_path)
             zip_file_name = os.path.basename(zip_file_path)
 
-            flash(f"4 archivos generados correctamente. Se descargará un ZIP automáticamente.", "success")
-            return redirect(url_for("download_file", filename=zip_file_name))
-            # # Llamar al processor que devuelve 4 archivos
-            # cab_mar, cab_otr, det_mar, det_otr = processor(input_path, output_path)
-            # files = [cab_mar, cab_otr, det_mar, det_otr]
-            
-            # # Armar mensaje detallado
-            # msg = (
-            #     f"4 archivos generados correctamente:\n"
-            #     f"MARATHON:\n"
-            #     f"- {os.path.basename(cab_mar)}\n"
-            #     f"- {os.path.basename(det_mar)}\n"
-            #     f"BLANCO:\n"
-            #     f"- {os.path.basename(cab_otr)}\n"
-            #     f"- {os.path.basename(det_otr)}"
-            # )
-            
-            # # Mostrar mensaje formateado
-            # flash(msg.replace("\n", "<br>"), "success")
+            # Detectar si se generaron archivos para MARATHON y/o BLANCO
+            grupos_presentes = []
+            if os.path.exists(output_path.replace(".csv", "_CABECERA_marathon.csv")):
+                grupos_presentes.append("MARATHON")
+            if os.path.exists(output_path.replace(".csv", "_CABECERA_blanco.csv")):
+                grupos_presentes.append("BLANCO")
 
-            # # Renderizar vista con enlaces de descarga
-            # return render_template("provider.html", provider=provider, config=provider_config, files=files)
+            # Construir mensaje compacto
+            grupos_str = " & ".join(grupos_presentes) if grupos_presentes else "Sin grupo"
+            msg = f"{grupos_str} - Se descargará un ZIP automáticamente: <strong>{zip_file_name}</strong>"
+
+            flash(msg, "success")
+            return redirect(url_for("handle_provider", provider=provider, filename=zip_file_name))
+
         else:
             # Procesamiento normal para los otros proveedores
             processor(input_path, output_path)  # Ejecuta la función directamente
             flash(f"Archivo transformado y guardado como {output_file_name}", "success")
             return redirect(url_for("handle_provider", provider=provider, filename=output_file_name))
-        
-    #return redirect(url_for('download_file', filename=output_file_name))
-
-
+            #return redirect(url_for('download_file', filename=output_file_name))
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
